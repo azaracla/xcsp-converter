@@ -44,6 +44,15 @@ instance = ET.Element('instance', {'xmlns:xsi':"http://www.w3.org/2001/XMLSchema
                                    'xsi:noNamespaceSchemaLocation':"src/frodo2/algorithms/XCSPschema.xsd"
                                    })
 
+# Presentation
+
+presentation = ET.SubElement(instance, "presentation", {
+        "name":"fapProblem",
+        "maxConstraintArity":"2",
+        "maximize":"false",
+        "format":"XCSP 2.1_FRODO"
+})
+
 # Generate agents section
 agents = ET.SubElement(instance, "agents", {"nbAgents":str(len(variables_data))})
 
@@ -79,12 +88,35 @@ predicates_data = [
         }
 ]
 
-predicates = ET.SubElement(instance, "predicates", {"nbPredicates":str(len(predicates_data))})
-for p in predicates_data:
-        p_tmp = ET.SubElement(predicates, "predicate", {"name":p["name"]})
+functions_data = [
+        {
+                "name":"SUP",
+                "parameters": "int X1 int X2 int K",
+                "function": "if(gt(abs(sub(X1, X2)), K),0,1)"
+        },
+        {
+                "name":"EQ",
+                "parameters": "int X1 int X2 int K",
+                "function": "if(eq(abs(sub(X1, X2)), K),0,1)"
+        }
+]
+
+#predicates = ET.SubElement(instance, "predicates", {"nbPredicates":str(len(predicates_data))})
+#for p in predicates_data:
+#        p_tmp = ET.SubElement(predicates, "predicate", {"name":p["name"]})
+#        param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
+#        exp_tmp = ET.SubElement(p_tmp, "expression")
+#        funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
+
+functions = ET.SubElement(instance, "functions", {"nbFunctions":str(len(functions_data))})
+for p in functions_data:
+        p_tmp = ET.SubElement(functions, "function", {
+                "name":p["name"],
+                "return":"int"})
         param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
         exp_tmp = ET.SubElement(p_tmp, "expression")
         funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
+
 
 constraints = ET.SubElement(instance, "constraints", {"nbConstraints":str(len(constraints_data))})
 
@@ -95,7 +127,7 @@ for c in constraints_data:
                 "arity":"2",
                 "reference":"{}".format("EQ" if c[3] == "=" else "SUP")
         })
-        param_tmp = ET.SubElement(ctr_tmp,"parameter").text = "x{} x{} {}".format(c[0], c[1], c[4])
+        param_tmp = ET.SubElement(ctr_tmp,"parameters").text = "x{} x{} {}".format(c[0], c[1], c[4])
 
 
 print(prettify(instance))
