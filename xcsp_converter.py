@@ -8,7 +8,7 @@ from xml.dom import minidom
 
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "ho:vfpi:", ["help", "output="])
+    opts, args = getopt.getopt(sys.argv[1:], "hovfpi:", ["help"])
 except getopt.GetoptError as err:
 	# print help information and exit:
 	print(err)  # will print something like "option -a not recognized"
@@ -17,9 +17,9 @@ except getopt.GetoptError as err:
 	sys.exit(2)
 
 hard = None
-output = None
+output = False
 verbose = False
-input = None
+input_folder = None
 for o, a in opts:
 	if o == "-v":
 		verbose = True
@@ -27,20 +27,20 @@ for o, a in opts:
 		#usage()
 		sys.exit()
 	elif o in ("-o", "--output"):
-		output = a
+		output = True
 	elif o in ("-p", "--predicates"):
 		hard = True
 	elif o in ("-f", "--functions"):
 		hard = False
 	elif o in ("-i"):
-		input = a
+		input_folder = a
 	else:
 		assert False, "unhandled option"
 
 if hard is None:
 	print("Select hard (-p) or soft (-f) constraints")
 	sys.exit()
-if input is None:
+if input_folder is None:
         print("Specify an input folder with -i")
         sys.exit()
 
@@ -57,7 +57,7 @@ def prettify(elem):
 domains_data = []
 
 # Open dom.txt
-with open(input+"dom.txt","r") as dom:
+with open(input_folder+"dom.txt","r") as dom:
     #Store each line in a line
     lines = [line.rstrip('\n') for line in dom]
     #Process each line
@@ -66,14 +66,14 @@ with open(input+"dom.txt","r") as dom:
 
 variables_data = []
 
-with open(input+"var.txt", "r") as var:
+with open(input_folder+"var.txt", "r") as var:
     lines = [line.rstrip('\n') for line in var]
     for line in lines:
         variables_data.append(line.split())
 
 constraints_data = []
 
-with open(input+"ctr.txt", "r") as ctr:
+with open(input_folder+"ctr.txt", "r") as ctr:
     lines = [line.rstrip('\n') for line in ctr]
     for line in lines:
         constraints_data.append(line.split())
@@ -171,4 +171,11 @@ for c in constraints_data:
         param_tmp = ET.SubElement(ctr_tmp,"parameters").text = "x{} x{} {}".format(c[0], c[1], c[4])
 
 
-print(prettify(instance))
+
+
+if output:
+	tmp = "hard" if hard else "soft"
+	tree = ET.ElementTree(instance)
+	tree.write("instance"+"-"+input_folder.split("/")[-2]+"-"+tmp+".xml")
+else:
+	print(prettify(instance))
