@@ -1,15 +1,55 @@
 import os
+import getopt, sys
 import xml.etree.cElementTree as ET
 
 from xml.etree import ElementTree
 from xml.dom import minidom
 
+
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "ho:vfpi:", ["help", "output="])
+except getopt.GetoptError as err:
+	# print help information and exit:
+	print(err)  # will print something like "option -a not recognized"
+	print("foo")
+	#usage()
+	sys.exit(2)
+
+hard = None
+output = None
+verbose = False
+input = None
+for o, a in opts:
+	if o == "-v":
+		verbose = True
+	elif o in ("-h", "--help"):
+		#usage()
+		sys.exit()
+	elif o in ("-o", "--output"):
+		output = a
+	elif o in ("-p", "--predicates"):
+		hard = True
+	elif o in ("-f", "--functions"):
+		hard = False
+	elif o in ("-i"):
+		input = a
+	else:
+		assert False, "unhandled option"
+
+if hard is None:
+	print("Select hard (-p) or soft (-f) constraints")
+	sys.exit()
+if input is None:
+        print("Specify an input folder with -i")
+        sys.exit()
+
 def prettify(elem):
-    """Return a pretty-printed XML string for the Element.
-    """
-    rough_string = ElementTree.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
+	"""Return a pretty-printed XML string for the Element.
+	"""
+	rough_string = ElementTree.tostring(elem, 'utf-8')
+	reparsed = minidom.parseString(rough_string)
+	return reparsed.toprettyxml(indent="  ")
 
 
 ## Parse .txt files
@@ -17,7 +57,7 @@ def prettify(elem):
 domains_data = []
 
 # Open dom.txt
-with open("dom.txt","r") as dom:
+with open(input+"dom.txt","r") as dom:
     #Store each line in a line
     lines = [line.rstrip('\n') for line in dom]
     #Process each line
@@ -26,14 +66,14 @@ with open("dom.txt","r") as dom:
 
 variables_data = []
 
-with open("var.txt", "r") as var:
+with open(input+"var.txt", "r") as var:
     lines = [line.rstrip('\n') for line in var]
     for line in lines:
         variables_data.append(line.split())
 
 constraints_data = []
 
-with open("ctr.txt", "r") as ctr:
+with open(input+"ctr.txt", "r") as ctr:
     lines = [line.rstrip('\n') for line in ctr]
     for line in lines:
         constraints_data.append(line.split())
@@ -101,21 +141,22 @@ functions_data = [
         }
 ]
 
-#predicates = ET.SubElement(instance, "predicates", {"nbPredicates":str(len(predicates_data))})
-#for p in predicates_data:
-#        p_tmp = ET.SubElement(predicates, "predicate", {"name":p["name"]})
-#        param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
-#        exp_tmp = ET.SubElement(p_tmp, "expression")
-#        funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
-
-functions = ET.SubElement(instance, "functions", {"nbFunctions":str(len(functions_data))})
-for p in functions_data:
-        p_tmp = ET.SubElement(functions, "function", {
-                "name":p["name"],
-                "return":"int"})
-        param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
-        exp_tmp = ET.SubElement(p_tmp, "expression")
-        funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
+if hard:
+	predicates = ET.SubElement(instance, "predicates", {"nbPredicates":str(len(predicates_data))})
+	for p in predicates_data:
+			p_tmp = ET.SubElement(predicates, "predicate", {"name":p["name"]})
+			param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
+			exp_tmp = ET.SubElement(p_tmp, "expression")
+			funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
+else:
+	functions = ET.SubElement(instance, "functions", {"nbFunctions":str(len(functions_data))})
+	for p in functions_data:
+			p_tmp = ET.SubElement(functions, "function", {
+					"name":p["name"],
+					"return":"int"})
+			param_tmp = ET.SubElement(p_tmp, "parameters").text = p["parameters"]
+			exp_tmp = ET.SubElement(p_tmp, "expression")
+			funct_tmp = ET.SubElement(exp_tmp, "functional").text = p["function"]
 
 
 constraints = ET.SubElement(instance, "constraints", {"nbConstraints":str(len(constraints_data))})
