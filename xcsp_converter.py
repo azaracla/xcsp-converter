@@ -176,6 +176,6 @@ for c in constraints_data:
 if output:
 	tmp = "hard" if hard else "soft"
 	tree = ET.ElementTree(instance)
-	tree.write("instance"+"-"+input_folder.split("/")[-2]+"-"+tmp+".xml")
+	tree.write("output/instance"+"-"+input_folder.split("/")[-2]+"-"+tmp+".xml")
 else:
 	print(prettify(instance))
