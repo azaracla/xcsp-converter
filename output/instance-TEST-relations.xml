@@ -1,0 +1,31 @@
+<instance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="src/frodo2/algorithms/XCSPschema.xsd">
+    <presentation format="XCSP 2.1_FRODO" maxConstraintArity="2" maximize="false" name="fapProblem" />
+    <agents nbAgents="4">
+        <agent name="F1" />
+        <agent name="F2" />
+        <agent name="F3" />
+        <agent name="F4" />
+    </agents>
+    <domains nbDomains="1">
+        <domain name="domain1" nbValues="3">1 2 3</domain>
+    </domains>
+    <variables nbVariables="4">
+        <variable agent="F1" domain="domain1" name="x1" />
+        <variable agent="F2" domain="domain1" name="x2" />
+        <variable agent="F3" domain="domain1" name="x3" />
+        <variable agent="F4" domain="domain1" name="x4" />
+    </variables>
+
+    <relations nbRelations="1">  
+        <relation name="SUP" arity="2" nbTuples="9" semantics="soft" defaultCost="0">  
+            0: 1 2 | 2 1 | 2 3 | 3 2 | 1: 1 3 | 3 1 | 2: 1 1 | 2 2 | 3 3
+        </relation>  
+    </relations>  
+
+    <constraints nbConstraints="4">
+        <constraint arity="2" name="x1_x2" reference="SUP" scope="x1 x2"/>
+        <constraint arity="2" name="x2_x3" reference="SUP" scope="x2 x3"/>
+        <constraint arity="2" name="x3_x4" reference="SUP" scope="x3 x4"/>
+        <constraint arity="2" name="x4_x1" reference="SUP" scope="x4 x1"/>
+    </constraints>
+</instance>

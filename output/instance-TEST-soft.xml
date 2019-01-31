@@ -15,6 +15,7 @@
         <variable agent="F3" domain="domain1" name="x3" />
         <variable agent="F4" domain="domain1" name="x4" />
     </variables>
+
     <functions nbFunctions="2">
         <function name="SUP" return="int">
             <parameters>int X1 int X2 int K</parameters>
@@ -29,6 +30,7 @@
             </expression>
         </function>
     </functions>
+
     <constraints nbConstraints="4">
         <constraint arity="2" name="x1_x2" reference="SUP" scope="x1 x2">
             <parameters>x1 x2 1</parameters>
@@ -39,7 +41,7 @@
         <constraint arity="2" name="x3_x4" reference="SUP" scope="x3 x4">
             <parameters>x3 x4 1</parameters>
         </constraint>
-        <constraint arity="2" name="x4_x1" reference="EQ" scope="x4 x1">
+        <constraint arity="2" name="x4_x1" reference="SUP" scope="x4 x1">
             <parameters>x4 x1 1</parameters>
         </constraint>
     </constraints>
